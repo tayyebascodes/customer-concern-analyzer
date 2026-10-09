@@ -1,0 +1,9 @@
+streamlit>=1.35.0
+openai-whisper>=20231117
+google-genai>=2.3.0
+gTTS>=2.5.1
+pydantic>=2.7.0
+audio-recorder-streamlit>=0.0.8
+soundfile>=0.12.1
+python-dotenv>=1.0.1
+pandas>=2.2.0

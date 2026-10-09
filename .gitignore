@@ -1,0 +1,33 @@
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv/
+
+# Environment Variables & Secrets (NEVER COMMIT)
+.env
+
+# Local SQLite Database
+*.db
+concerns.db
+
+# Generated Audio Files
+audio_outputs/
+*.mp3
+*.wav
+*.ogg
+*.m4a
+
+# Python cache & compiled bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.pt
+
+# Editor & IDE settings
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
