@@ -123,6 +123,7 @@ def analyze_transcript_with_gemini(
     business_context: Optional[str] = None,
     history_context: Optional[str] = None,
     conversation_history: Optional[List[Dict[str, Any]]] = None,
+    **kwargs: Any,
 ) -> Dict[str, Any]:
     """
     Step B: Analyzes transcript text using Google Gemini with structured output.

@@ -42,7 +42,7 @@ def init_db(db_path: str = DEFAULT_DB_PATH) -> None:
             """
         )
         conn.commit()
-    logger.info("Database initialized successfully at %s", db_path)
+    logger.debug("Database initialized successfully at %s", db_path)
 
 
 def insert_concern(

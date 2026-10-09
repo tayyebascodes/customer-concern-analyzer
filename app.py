@@ -42,8 +42,15 @@ if os.path.exists(scripts_dir) and scripts_dir not in os.environ.get("PATH", "")
     os.environ["PATH"] = scripts_dir + os.pathsep + os.environ.get("PATH", "")
 
 # Import internal modules
+import importlib
 import database as db
 import pipeline
+
+try:
+    importlib.reload(pipeline)
+    importlib.reload(db)
+except Exception:
+    pass
 
 logger = logging.getLogger(__name__)
 
@@ -516,12 +523,22 @@ with tab_studio:
                     # 2. Gemini Analysis with active conversation history
                     status_box.update(label="2/3 Grounding against active dialogue thread & history...", state="running")
                     history_summary = db.get_recent_summary_context(limit=5)
-                    analysis = pipeline.analyze_transcript_with_gemini(
-                        transcript,
-                        business_context=biz_context,
-                        history_context=history_summary,
-                        conversation_history=st.session_state["conversation_thread"],
-                    )
+                    try:
+                        analysis = pipeline.analyze_transcript_with_gemini(
+                            transcript,
+                            business_context=biz_context,
+                            history_context=history_summary,
+                            conversation_history=st.session_state["conversation_thread"],
+                        )
+                    except TypeError as te:
+                        if "conversation_history" in str(te):
+                            analysis = pipeline.analyze_transcript_with_gemini(
+                                transcript,
+                                business_context=biz_context,
+                                history_context=history_summary,
+                            )
+                        else:
+                            raise
 
                     # 3. Speech Synthesis
                     status_box.update(label="3/3 Synthesizing outbound acoustic response...", state="running")
