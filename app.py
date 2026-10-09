@@ -1,5 +1,5 @@
 """
-app.py - Customer Concern Analyzer
+app.py - V2V: Voice-to-Voice Customer Intelligence Ecosystem
 Theme: Hitit (Awwwards Nominee by ADAM Creative)
 Features:
   - Context-Conscious Active Conversation Memory (multi-turn dialogue continuity)
@@ -56,7 +56,7 @@ except ImportError:
 
 # Page configuration
 st.set_page_config(
-    page_title="Hitit — Customer Intelligence Ecosystem",
+    page_title="V2V — Voice-to-Voice Intelligence Ecosystem",
     page_icon="✈️",
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -380,11 +380,11 @@ st.markdown(
     <div class="hitit-header">
         <div class="hitit-telemetry-pill">
             <span class="pulse-dot"></span>
-            <span>Aviation-Grade Customer Intelligence</span>
+            <span>V2V INTELLIGENCE ECOSYSTEM</span>
         </div>
-        <h1 class="hitit-title">Crafting Clarity from <br>Every Voice Interaction</h1>
+        <h1 class="hitit-title">V2V</h1>
         <p class="hitit-subtitle">
-            Context-conscious customer dialogue intelligence: continuous thread memory across follow-ups, offline Whisper STT, and Google Gemini reasoning.
+            Voice-to-Voice Autonomous Customer Intelligence: continuous thread memory across follow-ups, offline Whisper STT, and Google Gemini reasoning.
         </p>
     </div>
     """,

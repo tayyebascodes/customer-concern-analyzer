@@ -1,6 +1,6 @@
-# 🎙️ Customer Concern Analyzer Dashboard
+# ✈️ V2V — Voice-to-Voice Customer Intelligence Ecosystem
 
-A **100% Free, Production-Ready Customer Concern Analyzer** built with Streamlit for Windows. It captures client voice recordings (browser mic or file upload), transcribes audio locally using OpenAI Whisper, structures business intelligence with Google Gemini Flash (Free Tier), synthesizes voice responses using gTTS, and persists historical interactions in a local SQLite database.
+A **100% Free, Production-Ready Voice-to-Voice (V2V) Customer Intelligence Dashboard** built with Streamlit for Windows. It captures client voice recordings (browser mic or file upload), maintains multi-turn active conversational context across consecutive voice messages, transcribes audio locally using OpenAI Whisper, structures business intelligence with Google Gemini Flash (Free Tier), synthesizes empathetic voice responses using gTTS, and persists historical interactions in a local SQLite database.
 
 ---
 
