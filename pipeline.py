@@ -121,10 +121,12 @@ def analyze_transcript_with_gemini(
     api_key: Optional[str] = None,
     business_context: Optional[str] = None,
     history_context: Optional[str] = None,
+    conversation_history: Optional[List[Dict[str, Any]]] = None,
 ) -> Dict[str, Any]:
     """
     Step B: Analyzes transcript text using Google Gemini with structured output.
-    Deeply reasons across business domain context and past historical interactions.
+    Deeply reasons across business domain context, past historical interactions,
+    and active multi-turn conversation memory for unbroken dialogue continuity.
     """
     # Resolve API Key
     effective_api_key = api_key or os.getenv("GEMINI_API_KEY")
@@ -154,25 +156,50 @@ def analyze_transcript_with_gemini(
     biz_desc = business_context.strip() if business_context else "General Business & Technology Customer Support"
     hist_desc = history_context.strip() if history_context else "No prior interaction history available."
 
+    # Format multi-turn ongoing conversation thread
+    conversation_thread_text = ""
+    if conversation_history:
+        thread_lines = []
+        for idx, turn in enumerate(conversation_history, 1):
+            user_msg = turn.get("user_transcript") or turn.get("transcript") or ""
+            ai_resp = turn.get("drafted_response") or ""
+            org_val = turn.get("organization") or ""
+            concerns = turn.get("core_concerns") or []
+            thread_lines.append(
+                f"Turn {idx} [Customer - {org_val}]: \"{user_msg}\"\n"
+                f"Turn {idx} [AI Response]: \"{ai_resp}\"\n"
+                f"   [Prior Concerns: {', '.join(concerns)}]"
+            )
+        conversation_thread_text = (
+            "=== ACTIVE MULTI-TURN DIALOGUE THREAD (SAME ONGOING CUSTOMER CONVERSATION) ===\n"
+            + "\n".join(thread_lines)
+            + "\n\nCRITICAL CONVERSATIONAL MEMORY RULE:\n"
+            "This incoming voice message is the NEXT TURN in the ongoing conversation thread above with the same customer. "
+            "You MUST remember all prior details, references (booking/ticket numbers, earlier explanations, names, requests), "
+            "and DO NOT treat this as a brand new isolated customer inquiry. Directly build on the ongoing topic, answer "
+            "follow-ups contextually, acknowledge previous statements, and carry forward unresolved demands or issues.\n"
+        )
+
     system_prompt = (
         f"You are the Chief Customer Intelligence & Executive Support AI for: {biz_desc}.\n\n"
-        "Your mission is to understand the FULL CONTEXT of incoming customer voice messages, "
-        "even when the user speaks briefly, informally, or when audio starts mid-sentence.\n\n"
-        "=== RECENT INTERACTION HISTORY (FOR CONTEXT CORRELATION) ===\n"
+        "Your mission is to maintain unbroken conversational continuity and deep contextual awareness. "
+        "Understand the FULL CONTEXT of incoming customer voice messages, including short follow-ups, demands, clarifications, or questions.\n\n"
+        f"{conversation_thread_text}\n"
+        "=== GLOBAL CLIENT HISTORY REFERENCE ===\n"
         f"{hist_desc}\n\n"
         "=== CONTEXT ANALYSIS INSTRUCTIONS ===\n"
-        "1. Context Reconstruction: If the message sounds clipped or fragmented (e.g., '...sure that I get my refund back tomorrow'), "
-        "infer the missing premise and check if this relates to a recent case in the history above.\n"
-        "2. Organization Identification: Extract the organization name. If not explicitly said, check if it matches a recent client from history, "
-        "or identify as 'Customer (Unspecified Organization)'. Do not make up fake companies.\n"
-        "3. Core Concerns: List 1 to 4 precise, actionable pain points. Capture emotional sentiment (frustration, anxiety, urgency) as well as factual complaints.\n"
+        "1. Active Conversation Continuity: If an active dialogue thread exists above, carry over the organization/client identity, "
+        "reference numbers, and ongoing topic. If the customer asks 'and what about the refund?' or 'how long will that take?', "
+        "connect it immediately to the specific problem discussed in previous turns.\n"
+        "2. Organization Identification: Maintain or extract the client/customer identity. If established in prior turns of this dialogue, keep it consistent.\n"
+        "3. Core Concerns: List 1 to 4 precise, actionable pain points. Include both new demands from this turn and ongoing core issues from this active dialogue.\n"
         "4. Urgency Classification: Choose strictly 'High' (service outages, financial risks, severe distress, tight deadlines), "
-        "'Medium' (billing inquiries, minor technical bugs, account changes), or 'Low' (feature requests, general check-ins, compliments).\n"
-        "5. Drafted Response: Compose an empathetic, polished spoken-style voice response. "
-        "Acknowledge their exact concern specifically, apologize genuinely if an error occurred, reassure them with clear next steps, and sign off warmly."
+        "'Medium' (operational adjustments, follow-ups, billing questions), or 'Low' (status checks, positive confirmations).\n"
+        "5. Drafted Response: Compose an empathetic, polished spoken-style voice response that directly answers the customer's follow-up or statement. "
+        "Acknowledge what they previously said, provide concrete answers or reassurance, and maintain an authentic human conversational flow."
     )
 
-    user_prompt = f"Customer Voice Message Transcript:\n\"\"\"\n{transcript}\n\"\"\""
+    user_prompt = f"Customer Voice Message (Current Turn):\n\"\"\"\n{transcript}\n\"\"\""
 
     data = None
     last_error = None

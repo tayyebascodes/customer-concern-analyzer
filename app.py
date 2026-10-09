@@ -1,11 +1,10 @@
 """
 app.py - Customer Concern Analyzer
 Theme: Hitit (Awwwards Nominee by ADAM Creative)
-Aviation & Aerospace-Grade AI Interface:
-  - Deep obsidian & dark slate canvas with ethereal aurora ambient glow
-  - Manrope & Urbanist modern geometric typography
-  - Floating pill navigation & frosted dark glassmorphic cards
-  - Real-time pulse telemetry & high-contrast intelligence analytics
+Features:
+  - Context-Conscious Active Conversation Memory (multi-turn dialogue continuity)
+  - Dynamic Hitit Aerospace UI: glowing pill tabs (no default underlines), animated buttons
+  - Paper plane sending action button (✈️ Send Voice Message)
   - 100% Free & Local Stack: Whisper STT + Google Gemini + gTTS + SQLite
 """
 
@@ -66,6 +65,10 @@ st.set_page_config(
 # Initialize database
 db.init_db()
 
+# Initialize session state for multi-turn conversation memory
+if "conversation_thread" not in st.session_state:
+    st.session_state["conversation_thread"] = []
+
 # ---------------------------------------------------------
 # Hitit Awwwards Design System (CSS)
 # ---------------------------------------------------------
@@ -102,7 +105,7 @@ st.markdown(
 
     /* Hitit Header & Brand Pill */
     .hitit-header {
-        margin-bottom: 2.5rem;
+        margin-bottom: 2.2rem;
     }
     .hitit-telemetry-pill {
         display: inline-flex;
@@ -117,7 +120,7 @@ st.markdown(
         letter-spacing: 0.16em;
         text-transform: uppercase;
         color: #38BDF8;
-        margin-bottom: 1.2rem;
+        margin-bottom: 1rem;
         backdrop-filter: blur(12px);
     }
     .pulse-dot {
@@ -135,7 +138,7 @@ st.markdown(
 
     .hitit-title {
         font-family: 'Urbanist', sans-serif;
-        font-size: 3.1rem;
+        font-size: 3rem;
         font-weight: 800;
         line-height: 1.08;
         letter-spacing: -0.035em;
@@ -146,17 +149,96 @@ st.markdown(
         -webkit-text-fill-color: transparent;
     }
     .hitit-subtitle {
-        font-size: 1.05rem;
+        font-size: 1.02rem;
         font-weight: 400;
         line-height: 1.6;
         color: #94A3B8;
-        max-width: 700px;
+        max-width: 720px;
         margin: 0;
     }
 
-    /* Hitit Aerospace Glassmorphism Card */
+    /* Hitit Dynamic Segmented Pill Tabs (Fixes default red underline) */
+    div[data-testid="stTabs"] [data-baseweb="tab-highlight"],
+    div[data-testid="stTabs"] [data-baseweb="tab-border"] {
+        display: none !important;
+        height: 0 !important;
+        background-color: transparent !important;
+        border: none !important;
+    }
+
+    div[data-testid="stTabs"] [data-baseweb="tab-list"] {
+        background: rgba(14, 18, 27, 0.8) !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        border-radius: 9999px !important;
+        padding: 5px !important;
+        gap: 6px !important;
+        width: fit-content !important;
+        margin-bottom: 2rem !important;
+        backdrop-filter: blur(20px) !important;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+    }
+
+    div[data-testid="stTabs"] button[data-baseweb="tab"] {
+        background: transparent !important;
+        border: 1px solid transparent !important;
+        border-radius: 9999px !important;
+        font-family: 'Manrope', sans-serif !important;
+        font-weight: 600 !important;
+        font-size: 0.92rem !important;
+        color: #94A3B8 !important;
+        padding: 9px 24px !important;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        cursor: pointer !important;
+    }
+
+    div[data-testid="stTabs"] button[data-baseweb="tab"]:hover {
+        color: #F8FAFC !important;
+        background: rgba(255, 255, 255, 0.06) !important;
+        transform: translateY(-1px) !important;
+    }
+
+    div[data-testid="stTabs"] button[data-baseweb="tab"][aria-selected="true"] {
+        background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%) !important;
+        color: #FFFFFF !important;
+        font-weight: 700 !important;
+        border: 1px solid rgba(56, 189, 248, 0.45) !important;
+        box-shadow: 0 4px 18px rgba(2, 132, 199, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+        transform: translateY(-1px) !important;
+    }
+
+    /* Dynamic Aerospace Send & Action Buttons */
+    .stButton > button {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 10px !important;
+        background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%) !important;
+        color: #FFFFFF !important;
+        font-family: 'Manrope', sans-serif !important;
+        font-size: 0.95rem !important;
+        font-weight: 700 !important;
+        letter-spacing: -0.01em !important;
+        border: 1px solid rgba(56, 189, 248, 0.5) !important;
+        border-radius: 9999px !important;
+        padding: 0.72rem 2.2rem !important;
+        box-shadow: 0 4px 20px rgba(2, 132, 199, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        cursor: pointer !important;
+    }
+    .stButton > button:hover {
+        background: linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%) !important;
+        transform: translateY(-2px) scale(1.02) !important;
+        box-shadow: 0 8px 30px rgba(14, 165, 233, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+        border-color: #38BDF8 !important;
+    }
+    .stButton > button:active {
+        transform: translateY(1px) scale(0.98) !important;
+        box-shadow: 0 2px 10px rgba(2, 132, 199, 0.3) !important;
+    }
+
+    /* Glassmorphic Container Cards */
     .hitit-card {
-        background: rgba(14, 18, 27, 0.72) !important;
+        background: rgba(14, 18, 27, 0.75) !important;
         border: 1px solid rgba(255, 255, 255, 0.08) !important;
         border-radius: 16px !important;
         padding: 1.8rem !important;
@@ -174,54 +256,39 @@ st.markdown(
         margin-bottom: 0.5rem;
     }
 
-    /* Hitit Minimalist Pill Tabs */
-    .stTabs [data-baseweb="tab-list"] {
-        background: rgba(255, 255, 255, 0.03) !important;
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
-        border-radius: 9999px !important;
-        padding: 4px !important;
-        gap: 6px !important;
-        width: fit-content !important;
-        margin-bottom: 2rem !important;
+    /* Dialogue Thread Turn Card */
+    .dialogue-turn-card {
+        background: rgba(18, 24, 38, 0.65);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 14px;
+        padding: 1.4rem;
+        margin-bottom: 1.2rem;
+        position: relative;
     }
-    .stTabs [data-baseweb="tab"] {
-        border-radius: 9999px !important;
-        font-family: 'Manrope', sans-serif !important;
-        font-weight: 600 !important;
-        font-size: 0.88rem !important;
-        color: #94A3B8 !important;
-        border: none !important;
-        padding: 8px 24px !important;
-        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    .dialogue-turn-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 0.6rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     }
-    .stTabs [data-baseweb="tab"]:hover {
-        color: #FFFFFF !important;
+    .dialogue-bubble-user {
+        background: rgba(30, 41, 59, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        border-radius: 12px;
+        padding: 12px 16px;
+        color: #E2E8F0;
+        margin-bottom: 1rem;
+        font-style: italic;
     }
-    .stTabs [aria-selected="true"] {
-        background: #FFFFFF !important;
-        color: #07090E !important;
-        font-weight: 700 !important;
-        box-shadow: 0 4px 20px rgba(255, 255, 255, 0.18) !important;
-    }
-
-    /* Hitit Signature Button (White inverted pill) */
-    .stButton > button {
-        background: #FFFFFF !important;
-        color: #07090E !important;
-        font-family: 'Manrope', sans-serif !important;
-        font-size: 0.92rem !important;
-        font-weight: 700 !important;
-        letter-spacing: -0.01em !important;
-        border: none !important;
-        border-radius: 9999px !important;
-        padding: 0.68rem 2.2rem !important;
-        box-shadow: 0 4px 24px rgba(255, 255, 255, 0.15) !important;
-        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
-    }
-    .stButton > button:hover {
-        background: #E2E8F0 !important;
-        transform: translateY(-2px) scale(1.01) !important;
-        box-shadow: 0 8px 30px rgba(255, 255, 255, 0.28) !important;
+    .dialogue-bubble-ai {
+        background: rgba(2, 132, 199, 0.12);
+        border: 1px solid rgba(56, 189, 248, 0.25);
+        border-radius: 12px;
+        padding: 14px 18px;
+        color: #F8FAFC;
+        line-height: 1.6;
     }
 
     /* Streamlit Input Overrides for Deep Obsidian */
@@ -242,7 +309,7 @@ st.markdown(
         box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.18) !important;
     }
 
-    /* Urgency Aviation Badges */
+    /* Urgency Badges */
     .hitit-badge {
         display: inline-flex;
         align-items: center;
@@ -295,7 +362,6 @@ st.markdown(
         letter-spacing: 0.1em !important;
     }
 
-    /* Clean Horizontal Dividers */
     hr {
         border: none !important;
         border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
@@ -318,7 +384,7 @@ st.markdown(
         </div>
         <h1 class="hitit-title">Crafting Clarity from <br>Every Voice Interaction</h1>
         <p class="hitit-subtitle">
-            Autonomous audio capture, offline Whisper transcription, and structured concern discovery powered by Google Gemini.
+            Context-conscious customer dialogue intelligence: continuous thread memory across follow-ups, offline Whisper STT, and Google Gemini reasoning.
         </p>
     </div>
     """,
@@ -365,9 +431,32 @@ tab_studio, tab_records = st.tabs(["Voice Capture", "Intelligence Archives"])
 
 
 # =========================================================
-# TAB 1: VOICE CAPTURE
+# TAB 1: VOICE CAPTURE (CONTEXT-CONSCIOUS DIALOGUE)
 # =========================================================
 with tab_studio:
+    # Context Consciousness Thread Status Indicator
+    thread_len = len(st.session_state["conversation_thread"])
+    if thread_len > 0:
+        latest_org = st.session_state["conversation_thread"][-1]["organization"]
+        t_col1, t_col2 = st.columns([3, 1])
+        with t_col1:
+            st.markdown(
+                f"""
+                <div style="background: rgba(14, 165, 233, 0.08); border: 1px solid rgba(56, 189, 248, 0.28); border-radius: 12px; padding: 10px 16px; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 10px;">
+                    <span class="pulse-dot"></span>
+                    <span style="color: #38BDF8; font-weight: 700; font-size: 0.85rem; letter-spacing: 0.05em; text-transform: uppercase;">ACTIVE CONVERSATION THREAD</span>
+                    <span style="color: #CBD5E1; font-size: 0.85rem;">— <b>{latest_org}</b> ({thread_len} turn{'s' if thread_len > 1 else ''} remembered)</span>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+        with t_col2:
+            if st.button("↺ Start New Thread", key="reset_dialogue"):
+                st.session_state["conversation_thread"] = []
+                st.session_state.pop("last_result", None)
+                st.toast("Conversation thread reset for new customer interaction.", icon="🔄")
+                st.rerun()
+
     st.markdown("##### Audio Source Stream")
     input_method = st.radio(
         "Source Stream:",
@@ -407,9 +496,10 @@ with tab_studio:
 
     st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
 
+    # Dynamic Send Action Button (Paper plane icon)
     col_action, _ = st.columns([1, 4])
     with col_action:
-        run_analysis = st.button("Analyze Audio Stream", type="primary", use_container_width=True)
+        run_analysis = st.button("✈️ Send Voice Message", type="primary", use_container_width=True)
 
     if run_analysis:
         if not audio_bytes:
@@ -417,26 +507,27 @@ with tab_studio:
         elif not os.getenv("GEMINI_API_KEY"):
             st.error("Gemini API key is required. Please set it in System Configuration.")
         else:
-            with st.status("Executing Intelligence Pipeline...", expanded=True) as status_box:
+            with st.status("Executing Intelligence Pipeline with Thread Context...", expanded=True) as status_box:
                 try:
                     # 1. Local STT
                     status_box.update(label="1/3 Transcribing audio stream with local Whisper...", state="running")
                     transcript = pipeline.transcribe_audio_bytes(audio_bytes)
 
-                    # 2. Gemini Analysis
-                    status_box.update(label="2/3 Grounding concerns & drafting reply with Gemini...", state="running")
+                    # 2. Gemini Analysis with active conversation history
+                    status_box.update(label="2/3 Grounding against active dialogue thread & history...", state="running")
                     history_summary = db.get_recent_summary_context(limit=5)
                     analysis = pipeline.analyze_transcript_with_gemini(
                         transcript,
                         business_context=biz_context,
                         history_context=history_summary,
+                        conversation_history=st.session_state["conversation_thread"],
                     )
 
                     # 3. Speech Synthesis
                     status_box.update(label="3/3 Synthesizing outbound acoustic response...", state="running")
                     audio_out_path = pipeline.synthesize_speech_gtts(analysis["drafted_response"])
 
-                    # 4. Storage
+                    # 4. Storage in SQLite
                     record_id = db.insert_concern(
                         organization=analysis["organization"],
                         urgency=analysis["urgency"],
@@ -446,18 +537,23 @@ with tab_studio:
                         audio_path=audio_out_path,
                     )
 
-                    status_box.update(label="Pipeline completed and stored.", state="complete", expanded=False)
-                    st.toast(f"Intelligence logged as Case #{record_id}", icon="✈️")
-
-                    st.session_state["last_result"] = {
+                    # 5. Append to Active Conversation Thread
+                    turn_data = {
+                        "turn_id": len(st.session_state["conversation_thread"]) + 1,
                         "id": record_id,
                         "organization": analysis["organization"],
                         "urgency": analysis["urgency"],
                         "core_concerns": analysis["core_concerns"],
-                        "transcript": transcript,
+                        "user_transcript": transcript,
                         "drafted_response": analysis["drafted_response"],
                         "audio_path": audio_out_path,
+                        "timestamp": datetime.now().strftime("%I:%M %p"),
                     }
+                    st.session_state["conversation_thread"].append(turn_data)
+                    st.session_state["last_result"] = turn_data
+
+                    status_box.update(label=f"Turn #{turn_data['turn_id']} processed & remembered.", state="complete", expanded=False)
+                    st.toast(f"Intelligence logged — Turn #{turn_data['turn_id']} saved!", icon="✈️")
 
                 except Exception as ex:
                     logger.exception("Pipeline processing error")
@@ -465,77 +561,64 @@ with tab_studio:
                     st.error(f"Execution error: {str(ex)}")
 
     # ---------------------------------------------------------
-    # Structured Intelligence Result Presentation
+    # Render Active Continuous Conversation Thread
     # ---------------------------------------------------------
-    if "last_result" in st.session_state:
-        res = st.session_state["last_result"]
-        urgency_lower = res["urgency"].lower()
-        badge_class = f"badge-{urgency_lower}"
-
+    if st.session_state["conversation_thread"]:
         st.markdown("<hr>", unsafe_allow_html=True)
+        st.markdown("### Ongoing Customer Dialogue")
+        st.caption("The AI retains memory of all previous turns in this thread to address evolving demands and follow-up questions contextually.")
 
-        hdr_l, hdr_r = st.columns([3, 1])
-        with hdr_l:
+        # Show dialogue turns in chronological order
+        for turn in st.session_state["conversation_thread"]:
+            urgency_lower = turn["urgency"].lower()
+            badge_class = f"badge-{urgency_lower}"
+
             st.markdown(
                 f"""
-                <div style="font-family: 'Urbanist', sans-serif; font-size: 1.8rem; font-weight: 800; color: #FFFFFF;">
-                    {res['organization']} 
-                    <span style="font-size: 0.95rem; font-weight: 500; color: #64748B; margin-left: 8px;">Case #{res['id']}</span>
-                </div>
+                <div class="dialogue-turn-card">
+                    <div class="dialogue-turn-header">
+                        <div>
+                            <span style="font-family: 'Urbanist', sans-serif; font-weight: 800; font-size: 1.15rem; color: #FFFFFF;">
+                                Turn #{turn['turn_id']} — {turn['organization']}
+                            </span>
+                            <span style="color: #64748B; font-size: 0.85rem; margin-left: 10px;">{turn['timestamp']} (Case #{turn['id']})</span>
+                        </div>
+                        <div>
+                            <span class="hitit-badge {badge_class}">{turn['urgency']} Urgency</span>
+                        </div>
+                    </div>
                 """,
                 unsafe_allow_html=True,
             )
-        with hdr_r:
-            st.markdown(
-                f'<div style="text-align: right; padding-top: 6px;"><span class="hitit-badge {badge_class}">{res["urgency"]} Urgency</span></div>',
-                unsafe_allow_html=True,
-            )
 
-        col_trans, col_resp = st.columns(2)
+            col_t_left, col_t_right = st.columns(2)
 
-        with col_trans:
-            st.markdown(
-                """
-                <div class="hitit-card">
-                    <div class="hitit-card-title">Customer Signal Transcript</div>
-                """,
-                unsafe_allow_html=True,
-            )
-            st.markdown(f"<p style='color: #CBD5E1; font-size: 1rem; line-height: 1.6; font-style: italic;'>\"{res['transcript']}\"</p>", unsafe_allow_html=True)
-            st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
-            st.markdown("<div class='hitit-card-title'>Extracted Core Concerns</div>", unsafe_allow_html=True)
-            for item in res["core_concerns"]:
-                st.markdown(f"<div style='color: #94A3B8; margin-bottom: 6px;'><span style='color: #38BDF8;'>▹</span> {item}</div>", unsafe_allow_html=True)
-            st.markdown("</div>", unsafe_allow_html=True)
+            with col_t_left:
+                st.markdown("<div style='font-size: 0.82rem; font-weight: 700; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px;'>🗣️ Customer Speech</div>", unsafe_allow_html=True)
+                st.markdown(f"<div class='dialogue-bubble-user'>\"{turn['user_transcript']}\"</div>", unsafe_allow_html=True)
+                
+                st.markdown("<div style='font-size: 0.82rem; font-weight: 700; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px;'>🎯 Extracted Demands & Concerns</div>", unsafe_allow_html=True)
+                for concern in turn["core_concerns"]:
+                    st.markdown(f"<div style='color: #CBD5E1; margin-bottom: 4px; font-size: 0.92rem;'><span style='color: #38BDF8;'>▹</span> {concern}</div>", unsafe_allow_html=True)
 
-        with col_resp:
-            st.markdown(
-                """
-                <div class="hitit-card">
-                    <div class="hitit-card-title">Synthesized Outbound Response</div>
-                """,
-                unsafe_allow_html=True,
-            )
-            st.markdown(
-                f"<div style='background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 14px; color: #F1F5F9; line-height: 1.6;'>\"{res['drafted_response']}\"</div>",
-                unsafe_allow_html=True,
-            )
-            st.markdown("<div style='height: 16px;'></div>", unsafe_allow_html=True)
-            st.markdown("<div class='hitit-card-title'>Acoustic Replay</div>", unsafe_allow_html=True)
+            with col_t_right:
+                st.markdown("<div style='font-size: 0.82rem; font-weight: 700; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px;'>✈️ Context-Aware Response</div>", unsafe_allow_html=True)
+                st.markdown(f"<div class='dialogue-bubble-ai'>\"{turn['drafted_response']}\"</div>", unsafe_allow_html=True)
 
-            if os.path.exists(res["audio_path"]):
-                with open(res["audio_path"], "rb") as audio_file:
-                    audio_bytes_out = audio_file.read()
-                st.audio(audio_bytes_out, format="audio/mp3")
-
-                st.download_button(
-                    label="Download Audio Track (.mp3)",
-                    data=audio_bytes_out,
-                    file_name=os.path.basename(res["audio_path"]),
-                    mime="audio/mp3",
-                )
-            else:
-                st.warning("Audio file unavailable on local storage.")
+                st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
+                if os.path.exists(turn["audio_path"]):
+                    with open(turn["audio_path"], "rb") as af:
+                        audio_data = af.read()
+                    st.audio(audio_data, format="audio/mp3")
+                    st.download_button(
+                        label=f"Download Response #{turn['turn_id']} (.mp3)",
+                        data=audio_data,
+                        file_name=os.path.basename(turn["audio_path"]),
+                        mime="audio/mp3",
+                        key=f"dl_turn_{turn['turn_id']}",
+                    )
+                else:
+                    st.caption("Acoustic file not found on disk.")
 
             st.markdown("</div>", unsafe_allow_html=True)
 
