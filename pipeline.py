@@ -5,6 +5,7 @@ Orchestrates:
   Step B: Structured Analysis via Google Gemini Flash-Lite ('google-genai' SDK).
   Step C: Text-to-Speech via gTTS (Local Google Text-to-Speech).
 """
+from __future__ import annotations
 
 import os
 import re
@@ -12,7 +13,7 @@ import json
 import uuid
 import tempfile
 import logging
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from datetime import datetime
 
 from pydantic import BaseModel, Field
